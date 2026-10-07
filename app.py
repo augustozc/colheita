@@ -66,6 +66,19 @@ ipca_mensal = df_ipca["valor"].iloc[-1]
 data_selic = df_selic["data"].iloc[-1]
 data_ipca = df_ipca["data"].iloc[-1]
 
+selic_projetada_por_ano = {
+    2026: 13.50,
+    2027: 12.00,
+    2028: 10.50,
+    2029: 10.00,
+}
+historico_tendencia_selic = {
+    2026: "Expectativa de corte residual em relação aos 13,75% atuais.",
+    2027: "Queda gradual mantida sob estabilidade há várias semanas.",
+    2028: "Continuidade do ciclo de afrouxamento monetário.",
+    2029: "Estabilização dos juros no patamar de dois dígitos.",
+}
+
 # Métricas Principais
 col1, col2, col3 = st.columns(3)
 col1.metric(
@@ -85,21 +98,47 @@ st.divider()
 # 4. PROJEÇÃO NOMINAL DE JUROS COMPOSTOS E CONSUMO
 st.subheader("📈 Projeção Matemática de Juros Compostos vs Consumo")
 st.markdown(
-    "Projeção nominal de 36 meses: a meta Selic anual é convertida para uma taxa mensal efetiva; "
+    "Projeção nominal de 36 meses, aplicando a premissa Selic de cada ano e convertendo-a "
+    "para uma taxa mensal efetiva; "
     "o último IPCA mensal é mantido constante apenas como hipótese para reajustar as retiradas."
+)
+st.caption(
+    f"A meta Selic vigente consultada no BCB é {selic_anual:.2f}% a.a.; "
+    "as taxas abaixo são premissas de cenário, não dados observados nem projeção oficial do BCB."
+)
+st.dataframe(
+    pd.DataFrame(
+        [
+            {
+                "Ano": ano,
+                "Selic projetada": f"{taxa:.2f}% a.a.",
+                "Tendência do cenário": historico_tendencia_selic[ano],
+            }
+            for ano, taxa in selic_projetada_por_ano.items()
+        ]
+    ),
+    hide_index=True,
+    use_container_width=True,
 )
 
 # Projeção simplificada em valores nominais, antes de impostos e taxas.
 meses = 36
 saldo_projetado = []
-datas_projetadas = pd.date_range(start=datetime.now(), periods=meses, freq='ME').strftime('%m/%Y').tolist()
+datas_projetadas = pd.date_range(start=datetime.now(), periods=meses, freq="ME")
+rotulos_datas_projetadas = datas_projetadas.strftime("%m/%Y").tolist()
 
-# Converte a meta Selic efetiva anual para uma taxa mensal equivalente.
-taxa_juros_mensal = (1 + selic_anual / 100) ** (1 / 12) - 1
+taxas_selic_anuais_mensais = [
+    selic_projetada_por_ano.get(data.year, selic_projetada_por_ano[2029])
+    for data in datas_projetadas
+]
+taxas_juros_mensais = [
+    (1 + taxa_anual / 100) ** (1 / 12) - 1
+    for taxa_anual in taxas_selic_anuais_mensais
+]
 taxa_inflacao_mensal = ipca_mensal / 100
 capital_atual = patrimonio_inicial - reserva_saude
 
-for i in range(meses):
+for i, taxa_juros_mensal in enumerate(taxas_juros_mensais):
     # Rendimento sobre o saldo do período
     rendimento = capital_atual * taxa_juros_mensal
     # Reajusta as retiradas pelo último IPCA mensal observado.
@@ -108,7 +147,7 @@ for i in range(meses):
 
 # Renderização do Gráfico com Plotly
 fig_projecao = go.Figure()
-fig_projecao.add_trace(go.Scatter(x=datas_projetadas, y=saldo_projetado, mode='lines+markers', name='Saldo Líquido Projetado', line=dict(color='#00FF00', width=4)))
+fig_projecao.add_trace(go.Scatter(x=rotulos_datas_projetadas, y=saldo_projetado, mode='lines+markers', name='Saldo Líquido Projetado', line=dict(color='#00FF00', width=4)))
 fig_projecao.update_layout(
     title="Curva de Resiliência do Capital Principal (Tesouro Selic)",
     template="plotly_dark",
@@ -124,7 +163,10 @@ st.divider()
 st.subheader("🤖 Auditoria Analítica via LPU Groq")
 
 if st.button("🚀 Rodar Auditoria de Estresse Patrimonial"):
-    taxa_selic_mensal_pct = taxa_juros_mensal * 100
+    taxas_selic_por_ano_texto = "; ".join(
+        f"{ano}: {taxa:.2f}% a.a."
+        for ano, taxa in selic_projetada_por_ano.items()
+    )
     total_retiradas_projetadas = sum(
         resgate_mensal * ((1 + taxa_inflacao_mensal) ** mes)
         for mes in range(meses)
@@ -132,8 +174,9 @@ if st.button("🚀 Rodar Auditoria de Estresse Patrimonial"):
     saldo_final_projetado = saldo_projetado[-1]
     contexto_dados = (
         f"BCB SGS 432: meta Selic vigente de {selic_anual:.2f}% a.a. em {data_selic}; "
-        f"convertida pela fórmula (1 + taxa anual)^(1/12) - 1 para {taxa_selic_mensal_pct:.4f}% a.m. "
-        f"BCB SGS 433: IPCA de {data_ipca} = {ipca_mensal:.2f}% no mês; é inflação observada, não anual."
+        f"BCB SGS 433: IPCA de {data_ipca} = {ipca_mensal:.2f}% no mês; é inflação observada, não anual. "
+        f"Premissas anuais da projeção (cenário informado): {taxas_selic_por_ano_texto}. "
+        "Em cada mês, a taxa anual daquele ano é convertida pela fórmula (1 + taxa anual)^(1/12) - 1."
     )
     prompt_usuario = (
         f"Use estas unidades sem convertê-las incorretamente: {contexto_dados} "
