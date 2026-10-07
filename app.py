@@ -115,25 +115,34 @@ st.subheader("🤖 Auditoria Analítica via LPU Groq")
 if st.button("🚀 Rodar Auditoria de Estresse Patrimonial"):
     contexto_dados = f"Selic Recente: {df_selic.tail(3).to_dict(orient='records')} | IPCA Recente: {df_ipca.tail(3).to_dict(orient='records')}"
     prompt_usuario = (
-        f"Com base nessas métricas oficiais: {contexto_dados}. Realize uma auditoria detalhada "
+        f"Com base nessas métricas: {contexto_dados}. Faça uma análise concisa "
         f"para uma carteira de R$ {patrimonio_inicial} (separando R$ {reserva_saude} para saúde), com retiradas mensais "
-        f"de R$ {resgate_mensal}. Simule a sustentabilidade absoluta pelos próximos 36 meses até outubro de 2029."
+        f"de R$ {resgate_mensal}, considerando 36 meses. Retorne Markdown válido em português, "
+        "com títulos e listas curtas, sem tabela mês a mês. Formate valores como R$ 860.000,00. "
+        "Explique as premissas e não trate a projeção como garantia nem como recomendação financeira."
     )
     
     with st.spinner("Conectando aos chips da Groq..."):
         try:
             chat_completion = client.chat.completions.create(
                 messages=[
-                    {"role": "system", "content": "Você é um renomado Estrategista de Renda Fixa. Responda estritamente em Markdown sem notas vazias."},
+                    {"role": "system", "content": "Responda somente com conteúdo Markdown legível. Não inclua objetos da API, escapes Unicode ou tabelas extensas."},
                     {"role": "user", "content": prompt_usuario}
                 ],
                 model=MODELO,
-                temperature=0.2
+                temperature=0.2,
+                max_completion_tokens=4096
             )
-            
-            resposta = chat_completion.choices
-            texto = resposta.message.content if hasattr(resposta, 'message') else resposta['message']['content'] if isinstance(resposta, dict) else str(resposta)
+
+            escolha = chat_completion.choices[0]
+            texto = escolha.message.content
+            if not texto:
+                raise RuntimeError("A Groq retornou uma resposta vazia.")
+
             st.markdown(texto)
-            st.success("Auditoria analítica concluída com sucesso!")
+            if escolha.finish_reason == "length":
+                st.warning("A resposta atingiu o limite de geração e pode estar incompleta.")
+            else:
+                st.success("Auditoria analítica concluída com sucesso!")
         except Exception as e:
             st.error(f"Erro na infraestrutura de IA: {str(e)}")
