@@ -1,0 +1,50 @@
+2026-10-05T16:37:14.983328763Z            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+2026-10-05T16:37:14.983331663Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/util.py", line 420, in import_app
+2026-10-05T16:37:14.983334614Z     mod = importlib.import_module(module)
+2026-10-05T16:37:14.983337524Z   File "/opt/render/project/python/Python-3.14.3/lib/python3.14/importlib/__init__.py", line 88, in import_module
+2026-10-05T16:37:14.983341574Z     return _bootstrap._gcd_import(name[level:], package, level)
+2026-10-05T16:37:14.983344544Z            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-05T16:37:14.983347494Z   File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+2026-10-05T16:37:14.983350454Z   File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+2026-10-05T16:37:14.983357744Z   File "<frozen importlib._bootstrap>", line 1335, in _find_and_load_unlocked
+2026-10-05T16:37:14.983428696Z ModuleNotFoundError: No module named 'web'
+2026-10-05T16:37:22.055030779Z ==> Exited with status 1
+2026-10-05T16:37:22.06503897Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+2026-10-05T16:37:23.622576126Z ==> Running 'gunicorn web:app --bind 0.0.0.0:$PORT'
+2026-10-05T16:37:27.817935683Z Traceback (most recent call last):
+2026-10-05T16:37:27.81893083Z   File "/opt/render/project/src/.venv/bin/gunicorn", line 7, in <module>
+2026-10-05T16:37:27.81894674Z     sys.exit(run())
+2026-10-05T16:37:27.81895029Z              ~~~^^
+2026-10-05T16:37:27.8189547Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/app/wsgiapp.py", line 66, in run
+2026-10-05T16:37:27.818959811Z     WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]", prog=prog).run()
+2026-10-05T16:37:27.81896248Z     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+2026-10-05T16:37:27.818965741Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/app/base.py", line 235, in run
+2026-10-05T16:37:27.818968551Z     super().run()
+2026-10-05T16:37:27.818971861Z     ~~~~~~~~~~~^^
+2026-10-05T16:37:27.818974941Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/app/base.py", line 71, in run
+2026-10-05T16:37:27.818978321Z     Arbiter(self).run()
+2026-10-05T16:37:27.818981351Z     ~~~~~~~^^^^^^
+2026-10-05T16:37:27.818984241Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/arbiter.py", line 63, in __init__
+2026-10-05T16:37:27.818987111Z     self.setup(app)
+2026-10-05T16:37:27.818990151Z     ~~~~~~~~~~^^^^^
+2026-10-05T16:37:27.818992951Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/arbiter.py", line 164, in setup
+2026-10-05T16:37:27.818996632Z     self.app.wsgi()
+2026-10-05T16:37:27.818999501Z     ~~~~~~~~~~~~~^^
+2026-10-05T16:37:27.819002302Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2026-10-05T16:37:27.819005792Z     self.callable = self.load()
+2026-10-05T16:37:27.819008702Z                     ~~~~~~~~~^^
+2026-10-05T16:37:27.819011702Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2026-10-05T16:37:27.819014372Z     return self.load_wsgiapp()
+2026-10-05T16:37:27.819016922Z            ~~~~~~~~~~~~~~~~~^^
+2026-10-05T16:37:27.819020312Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2026-10-05T16:37:27.819023962Z     return util.import_app(self.app_uri)
+2026-10-05T16:37:27.819026342Z            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+2026-10-05T16:37:27.819028302Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/util.py", line 420, in import_app
+2026-10-05T16:37:27.819030222Z     mod = importlib.import_module(module)
+2026-10-05T16:37:27.819032153Z   File "/opt/render/project/python/Python-3.14.3/lib/python3.14/importlib/__init__.py", line 88, in import_module
+2026-10-05T16:37:27.819034542Z     return _bootstrap._gcd_import(name[level:], package, level)
+2026-10-05T16:37:27.819036413Z            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-05T16:37:27.819048333Z   File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+2026-10-05T16:37:27.819050773Z   File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+2026-10-05T16:37:27.819052913Z   File "<frozen importlib._bootstrap>", line 1335, in _find_and_load_unlocked
+2026-10-05T16:37:27.819059293Z ModuleNotFoundError: No module named 'web'
